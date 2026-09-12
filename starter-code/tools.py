@@ -14,12 +14,19 @@ def get_flight_info(origin: str, destination: str, max_price: int = 5000000) -> 
     
     with open(flight_file, "r", encoding="utf-8") as f:
         flights = json.load(f)
+
+    try:
+        budget = int(max_price)
+    except (TypeError, ValueError):
+        return []
+    origin_code = str(origin).strip().upper()
+    destination_code = str(destination).strip().upper()
     
     results = [
         fl for fl in flights
-        if fl["origin"].upper() == origin.upper()
-        and fl["destination"].upper() == destination.upper()
-        and fl["price_vnd"] <= max_price
+        if fl["origin"].upper() == origin_code
+        and fl["destination"].upper() == destination_code
+        and fl["price_vnd"] <= budget
     ]
     return results
 
@@ -34,7 +41,8 @@ def get_weather_forecast(city_code: str) -> Dict[str, Any]:
     with open(weather_file, "r", encoding="utf-8") as f:
         weather_data = json.load(f)
     
-    return weather_data.get(city_code.upper(), {"error": f"No data for {city_code}"})
+    city = str(city_code).strip().upper()
+    return weather_data.get(city, {"error": f"No data for {city_code}"})
 
 # Tool Registry for ReAct Agent
 TOOL_DEFINITIONS = [
